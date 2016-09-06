@@ -1,14 +1,13 @@
 <?php namespace im\MultiTenant;
 
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
 
 /**
- * Class TenantableServiceProvider
+ * Class TenantServiceProvider
  *
  * @package im\MultiTenant
  */
-class TenantableServiceProvider extends ServiceProvider
+class TenantServiceProvider extends ServiceProvider
 {
 
     /**
@@ -26,13 +25,10 @@ class TenantableServiceProvider extends ServiceProvider
      */
     public function boot(Resolver $resolver)
     {
-
         //resolve tenant, catch PDOExceptions to prevent errors during migration
         try {
             $resolver->resolveTenant();
         } catch (\PDOException $e) {
         }
-
     }
-
 }

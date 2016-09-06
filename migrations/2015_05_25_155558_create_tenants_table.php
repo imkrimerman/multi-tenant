@@ -19,6 +19,8 @@ class CreateTenantsTable extends Migration
             $table->increments('id');
             $table->string('uuid', 255)->unique();
             $table->string('domain')->unique();
+            $table->text('name');
+            $table->text('slug');
             $table->text('driver');
             $table->text('host');
             $table->text('database');

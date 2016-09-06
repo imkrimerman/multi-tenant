@@ -21,11 +21,13 @@ class Tenant extends Model
      */
     protected $fillable = [
         'uuid',
+        'name',
+        'slug',
         'domain',
         'driver',
         'host',
         'database',
-        'user',
+        'username',
         'password',
         'prefix',
         'meta'
@@ -36,6 +38,8 @@ class Tenant extends Model
      */
     protected $casts = [
         'uuid' => 'string',
+        'name' => 'string',
+        'slug' => 'string',
         'domain' => 'string',
         'driver' => 'string',
         'host' => 'string',
@@ -72,15 +76,15 @@ class Tenant extends Model
 
         static::creating(function ($tenant) {
 
-            $uuids = app('db')->connection(config('tenantable.database.default'))->table('tenants')->lists('uuid');
+            $uuids = app('db')->connection(config('tenantable.database.default'))->table('tenants')->pluck('uuid');
 
             $uuid = $tenant->generateUuid();
 
-            while (in_array($uuid, $uuids)) {
+            while ($uuids->values()->has($uuid)) {
                 $uuid = $tenant->generateUuid();
             }
 
-            $tenant->persistUuid($uuid);
+            $tenant->setUuid($uuid);
         });
 
     }
@@ -99,7 +103,7 @@ class Tenant extends Model
     /**
      * @param $value
      */
-    public function persistUuid($value)
+    public function setUuid($value)
     {
         $this->attributes['uuid'] = $value;
     }
@@ -127,11 +131,11 @@ class Tenant extends Model
      */
     private function decryptAttribute($value)
     {
-        if ($this->shouldBeEncrypted && $value != '') {
+        if ($this->shouldBeEncrypted) {
             return Crypt::decrypt($value);
         }
 
-        return '';
+        return $value;
     }
 
     /**
@@ -176,16 +180,11 @@ class Tenant extends Model
      */
     private function encryptAttribute($attribute, $value)
     {
-        if (!$this->shouldBeEncrypted) return;
-
-        if (empty($value)) {
-
-            $this->attributes[$attribute] = '';
-
-            return;
+        if ($this->shouldBeEncrypted) {
+            $value = Crypt::encrypt($value);
         }
 
-        $this->attributes[$attribute] = Crypt::encrypt($value);
+        $this->attributes[$attribute] = $value;
     }
 
     /**

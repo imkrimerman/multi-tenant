@@ -1,11 +1,11 @@
-<?php namespace im\Tenantable;
+<?php namespace im\MultiTenant;
 
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * Class Domain
  *
- * @package im\Tenantable
+ * @package im\MultiTenant
  */
 class Domain extends Model
 {

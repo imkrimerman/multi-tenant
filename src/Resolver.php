@@ -1,12 +1,12 @@
-<?php namespace im\Tenantable;
+<?php namespace im\MultiTenant;
 
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
-use im\Tenantable\Events\SetActiveTenantEvent;
-use im\Tenantable\Events\TenantNotResolvedEvent;
-use im\Tenantable\Events\TenantResolvedEvent;
+use im\MultiTenant\Events\SetActiveTenantEvent;
+use im\MultiTenant\Events\TenantNotResolvedEvent;
+use im\MultiTenant\Events\TenantResolvedEvent;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Event\ConsoleExceptionEvent;
@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 /**
  * Class Resolver
  *
- * @package im\Tenantable
+ * @package im\MultiTenant
  */
 class Resolver
 {
@@ -292,20 +292,24 @@ class Resolver
      */
     public function setDefaultConnection()
     {
-
         $tenant = $this->getActiveTenant();
+
         config()->set('database.connections.tenant.driver', $tenant->driver);
         config()->set('database.connections.tenant.host', $tenant->host);
         config()->set('database.connections.tenant.database', $tenant->database);
         config()->set('database.connections.tenant.username', $tenant->username);
         config()->set('database.connections.tenant.password', $tenant->password);
+
         if (!empty($tenant->prefix)) {
             $tenant->prefix .= '_';
         }
+
         config()->set('database.connections.tenant.prefix', $tenant->prefix);
+
         if ($tenant->driver == 'mysql') {
             config()->set('database.connections.tenant.strict', config('database.connections.mysql.strict'));
         }
+
         config()->set('database.connections.tenant.charset', 'utf8');
         config()->set('database.connections.tenant.collation', 'utf8_unicode_ci');
 

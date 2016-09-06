@@ -1,4 +1,4 @@
-<?php namespace im\Tenantable;
+<?php namespace im\MultiTenant;
 
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\ServiceProvider;
@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 /**
  * Class TenantableServiceProvider
  *
- * @package im\Tenantable
+ * @package im\MultiTenant
  */
 class TenantableServiceProvider extends ServiceProvider
 {

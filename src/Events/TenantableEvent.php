@@ -1,7 +1,7 @@
-<?php namespace im\Tenantable\Events;
+<?php namespace im\MultiTenant\Events;
 
 use Illuminate\Queue\SerializesModels;
-use im\Tenantable\Tenant;
+use im\MultiTenant\Tenant;
 
 abstract class TenantableEvent
 {

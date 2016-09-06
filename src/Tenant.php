@@ -1,13 +1,12 @@
-<?php namespace im\Tenantable;
+<?php namespace im\MultiTenant;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class Tenant
  *
- * @package im\Tenantable
+ * @package im\MultiTenant
  */
 class Tenant extends Model
 {

@@ -1,6 +1,6 @@
-<?php namespace im\Tenantable\Events;
+<?php namespace im\MultiTenant\Events;
 
-use im\Tenantable\Resolver;
+use im\MultiTenant\Resolver;
 
 class TenantNotResolvedEvent
 {

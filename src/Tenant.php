@@ -1,23 +1,25 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: leemason
- * Date: 31/10/15
- * Time: 17:23
- */
-
-namespace LeeMason\Tenantable;
-
+<?php namespace im\Tenantable;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * Class Tenant
+ *
+ * @package im\Tenantable
+ */
 class Tenant extends Model
 {
 
+    /**
+     * @var string
+     */
     protected $table = 'tenants';
 
+    /**
+     * @var array
+     */
     protected $fillable = [
         'uuid',
         'domain',
@@ -30,6 +32,9 @@ class Tenant extends Model
         'meta'
     ];
 
+    /**
+     * @var array
+     */
     protected $casts = [
         'uuid' => 'string',
         'domain' => 'string',
@@ -42,87 +47,178 @@ class Tenant extends Model
         'meta' => 'collection'
     ];
 
-    public function __construct(array $attributes = []){
+    /**
+     * @var bool
+     */
+    protected $shouldBeEncrypted = false;
+
+    /**
+     * Tenant constructor.
+     *
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
         $this->setConnection(config('tenantable.database.default'));
+
         parent::__construct($attributes);
     }
 
+    /**
+     * Boot tenant model.
+     */
     protected static function boot()
     {
         parent::boot();
 
-        static::creating(function($tenant){
+        static::creating(function ($tenant) {
+
             $uuids = app('db')->connection(config('tenantable.database.default'))->table('tenants')->lists('uuid');
+
             $uuid = $tenant->generateUuid();
-            while(in_array($uuid, $uuids)){
+
+            while (in_array($uuid, $uuids)) {
                 $uuid = $tenant->generateUuid();
             }
+
             $tenant->persistUuid($uuid);
         });
 
     }
 
-    public function generateUuid(){
-        return strtolower( substr( str_shuffle( preg_replace("/[^A-Za-z0-9]/", '', bcrypt( time() . $this->toJson() . microtime() ) ) ), 0, 8 ) );
+    /**
+     * @return string
+     */
+    public function generateUuid()
+    {
+        return strtolower(
+            substr(str_shuffle(preg_replace("/[^A-Za-z0-9]/", '',
+                bcrypt(time() . $this->toJson() . microtime()))), 0, 8)
+        );
     }
 
-    public function persistUuid($value){
+    /**
+     * @param $value
+     */
+    public function persistUuid($value)
+    {
         $this->attributes['uuid'] = $value;
     }
 
-    public function domains(){
+    /**
+     * @return mixed
+     */
+    public function domains()
+    {
         return $this->hasMany(Domain::class);
     }
 
-    public function getHostAttribute($value){
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getHostAttribute($value)
+    {
         return $this->decryptAttribute($value);
     }
 
-    public function getDatabaseAttribute($value){
-        return $this->decryptAttribute($value);
-    }
-
-    public function getUsernameAttribute($value){
-        return $this->decryptAttribute($value);
-    }
-
-    public function getPasswordAttribute($value){
-        return $this->decryptAttribute($value);
-    }
-
-    public function setHostAttribute($value){
-        $this->encryptAttribute('host', $value);
-    }
-
-    public function setDatabaseAttribute($value){
-        $this->encryptAttribute('database', $value);
-    }
-
-    public function setUsernameAttribute($value){
-        $this->encryptAttribute('username', $value);
-    }
-
-    public function setPasswordAttribute($value){
-        $this->encryptAttribute('password', $value);
-    }
-
-    private function encryptAttribute($attribute, $value){
-        if($value == ''){
-            $this->attributes[$attribute] = '';
-            return;
-        }
-        $this->attributes[$attribute] = Crypt::encrypt($value);
-    }
-
-    private function decryptAttribute($value){
-        if($value != ''){
+    /**
+     * @param $value
+     * @return string
+     */
+    private function decryptAttribute($value)
+    {
+        if ($this->shouldBeEncrypted && $value != '') {
             return Crypt::decrypt($value);
         }
+
         return '';
     }
 
-    public function setUuidAttribute($value){
-        //set nothing here!
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getDatabaseAttribute($value)
+    {
+        return $this->decryptAttribute($value);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getUsernameAttribute($value)
+    {
+        return $this->decryptAttribute($value);
+    }
+
+    /**
+     * @param $value
+     * @return string
+     */
+    public function getPasswordAttribute($value)
+    {
+        return $this->decryptAttribute($value);
+    }
+
+    /**
+     * @param $value
+     */
+    public function setHostAttribute($value)
+    {
+        $this->encryptAttribute('host', $value);
+    }
+
+    /**
+     * @param $attribute
+     * @param $value
+     * @return string
+     */
+    private function encryptAttribute($attribute, $value)
+    {
+        if (!$this->shouldBeEncrypted) return;
+
+        if (empty($value)) {
+
+            $this->attributes[$attribute] = '';
+
+            return;
+        }
+
+        $this->attributes[$attribute] = Crypt::encrypt($value);
+    }
+
+    /**
+     * @param $value
+     */
+    public function setDatabaseAttribute($value)
+    {
+        $this->encryptAttribute('database', $value);
+    }
+
+    /**
+     * @param $value
+     */
+    public function setUsernameAttribute($value)
+    {
+        $this->encryptAttribute('username', $value);
+    }
+
+    /**
+     * @param $value
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->encryptAttribute('password', $value);
+    }
+
+    /**
+     * @param $value
+     */
+    public function setUuidAttribute($value)
+    {
+
     }
 
 }

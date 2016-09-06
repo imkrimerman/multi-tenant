@@ -1,10 +1,11 @@
 <?php
 
-use \Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class CreateTenantsDomainsTable extends Migration {
+class CreateTenantsDomainsTable extends Migration
+{
 
     /**
      * Run the migrations.
@@ -13,15 +14,19 @@ class CreateTenantsDomainsTable extends Migration {
      */
     public function up()
     {
-        Schema::create('domains', function(Blueprint $table){
+        Schema::create('tenant_domains', function (Blueprint $table) {
             $table->engine = 'InnoDB';
-
             $table->increments('id');
             $table->integer('tenant_id')->unsigned()->index();
             $table->string('domain')->unique();
             $table->text('meta');
             $table->timestamps();
-            //$table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+
+            Schema::disableForeignKeyConstraints();
+
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+
+            Schema::enableForeignKeyConstraints();
         });
     }
 
@@ -32,8 +37,7 @@ class CreateTenantsDomainsTable extends Migration {
      */
     public function down()
     {
-        //
-        Schema::drop('domains');
+        Schema::drop('tenant_domains');
     }
 
 }

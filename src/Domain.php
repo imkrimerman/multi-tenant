@@ -1,37 +1,47 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: leemason
- * Date: 31/10/15
- * Time: 17:23
- */
-
-namespace LeeMason\Tenantable;
-
+<?php namespace im\Tenantable;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * Class Domain
+ *
+ * @package im\Tenantable
+ */
 class Domain extends Model
 {
 
-    protected $table = 'domains';
+    /**
+     * @var string
+     */
+    protected $table = 'tenant_domains';
 
-    protected $fillable = [
-        'domain',
-        'meta'
-    ];
+    /**
+     * @var array
+     */
+    protected $fillable = ['domain', 'meta'];
 
-    protected $casts = [
-        'domain' => 'string',
-        'meta' => 'collection'
-    ];
+    /**
+     * @var array
+     */
+    protected $casts = ['domain' => 'string', 'meta' => 'collection'];
 
-    public function __construct(array $attributes = []){
+    /**
+     * Domain constructor.
+     *
+     * @param array $attributes
+     */
+    public function __construct(array $attributes = [])
+    {
         $this->setConnection(config('tenantable.database.default'));
+
         parent::__construct($attributes);
     }
 
-    public function tenant(){
+    /**
+     * @return mixed
+     */
+    public function tenant()
+    {
         return $this->belongsTo(Tenant::class);
     }
 

@@ -1,13 +1,4 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: leemason
- * Date: 31/10/15
- * Time: 22:14
- */
-
-namespace LeeMason\Tenantable\Events;
-
+<?php namespace im\Tenantable\Events;
 
 class TenantResolvedEvent extends TenantableEvent
 {
